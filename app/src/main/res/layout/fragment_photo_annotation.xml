@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:orientation="vertical">
+
+    <!-- Header / Toolbar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#6200EE"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
+
+        <ImageButton
+            android:id="@+id/btnBackAnnotation"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Volver"
+            android:src="@drawable/ic_arrow_back"
+            android:tint="#FFFFFF" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:paddingStart="8dp"
+            android:text="Anotar imagen"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+        <!-- Botón limpiar anotaciones -->
+        <ImageButton
+            android:id="@+id/btnClearAnnotations"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Limpiar"
+            android:src="@drawable/ic_delete"
+            android:tint="#FFFFFF" />
+
+        <!-- Botón confirmar anotaciones -->
+        <ImageButton
+            android:id="@+id/btnConfirmAnnotations"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Confirmar"
+            android:src="@drawable/ic_check"
+            android:tint="#FFFFFF" />
+
+    </LinearLayout>
+
+    <!-- Herramientas de anotación -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="#1A1A2E"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <!-- Herramienta: Texto -->
+            <LinearLayout
+                android:id="@+id/toolText"
+                android:layout_width="64dp"
+                android:layout_height="44dp"
+                android:background="#6200EE"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginEnd="6dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_text_fields"
+                    android:tint="#FFFFFF"
+                    android:contentDescription="Texto" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Texto"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9sp" />
+
+            </LinearLayout>
+
+            <!-- Herramienta: Dibujar -->
+            <LinearLayout
+                android:id="@+id/toolDraw"
+                android:layout_width="64dp"
+                android:layout_height="44dp"
+                android:background="#2D2D44"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginEnd="6dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_edit"
+                    android:tint="#CCCCCC"
+                    android:contentDescription="Dibujar" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dibujar"
+                    android:textColor="#CCCCCC"
+                    android:textSize="9sp" />
+
+            </LinearLayout>
+
+            <!-- Herramienta: Flecha -->
+            <LinearLayout
+                android:id="@+id/toolArrow"
+                android:layout_width="64dp"
+                android:layout_height="44dp"
+                android:background="#2D2D44"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginEnd="6dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_forward"
+                    android:tint="#CCCCCC"
+                    android:contentDescription="Flecha" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Flecha"
+                    android:textColor="#CCCCCC"
+                    android:textSize="9sp" />
+
+            </LinearLayout>
+
+            <!-- Herramienta: Resaltar -->
+            <LinearLayout
+                android:id="@+id/toolHighlight"
+                android:layout_width="64dp"
+                android:layout_height="44dp"
+                android:background="#2D2D44"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginEnd="6dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_highlight"
+                    android:tint="#CCCCCC"
+                    android:contentDescription="Resaltar" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Resaltar"
+                    android:textColor="#CCCCCC"
+                    android:textSize="9sp" />
+
+            </LinearLayout>
+
+            <!-- Separador -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="32dp"
+                android:background="#444444"
+                android:layout_marginEnd="6dp" />
+
+            <!-- Color: Blanco -->
+            <View
+                android:id="@+id/colorWhite"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="#FFFFFF"
+                android:layout_marginEnd="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- Color: Amarillo -->
+            <View
+                android:id="@+id/colorYellow"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="#FFEB3B"
+                android:layout_marginEnd="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- Color: Rojo -->
+            <View
+                android:id="@+id/colorRed"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="#F44336"
+                android:layout_marginEnd="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- Color: Verde -->
+            <View
+                android:id="@+id/colorGreen"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="#4CAF50"
+                android:layout_marginEnd="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <!-- Área principal: imagen + anotaciones -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Imagen de fondo -->
+        <ImageView
+            android:id="@+id/ivAnnotationImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:contentDescription="Imagen para anotar" />
+
+        <!-- Capa de anotaciones (canvas personalizado) -->
+        <!-- En el código Kotlin: se infla un AnnotationView aquí -->
+        <View
+            android:id="@+id/annotationCanvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent" />
+
+        <!-- Campo de texto flotante para anotaciones (oculto por defecto) -->
+        <LinearLayout
+            android:id="@+id/layoutAnnotationInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="#CC000000"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/etAnnotationText"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="#33FFFFFF"
+                android:fontFamily="sans-serif"
+                android:hint="Escribe una anotación..."
+                android:textColor="#FFFFFF"
+                android:textColorHint="#AAAAAA"
+                android:textSize="14sp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:inputType="textCapSentences"
+                android:imeOptions="actionDone" />
+
+            <ImageButton
+                android:id="@+id/btnAddTextAnnotation"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="#6200EE"
+                android:contentDescription="Agregar texto"
+                android:src="@drawable/ic_check"
+                android:tint="#FFFFFF" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- Barra inferior de acciones -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#1A1A2E"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <Button
+            android:id="@+id/btnCancelAnnotation"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="#2D2D44"
+            android:fontFamily="sans-serif-medium"
+            android:text="Cancelar"
+            android:textColor="#CCCCCC"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnSaveAnnotation"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:background="#6200EE"
+            android:fontFamily="sans-serif-medium"
+            android:text="Guardar anotación"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+</LinearLayout>
