@@ -6,4 +6,6 @@ sealed class AppScreens(val route: String) {
     object DashboardScreen: AppScreens("dashboard_screen")
     object RedactarNotaScreen: AppScreens("redactar_nota_screen")
     object SettingsScreen: AppScreens("settings_screen")
+
+    object ExportScreen: AppScreens("export_screen")
 }

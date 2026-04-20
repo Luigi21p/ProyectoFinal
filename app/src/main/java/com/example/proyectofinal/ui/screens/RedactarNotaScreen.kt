@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.proyectofinal.ui.navigation.AppScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +73,20 @@ fun RedactarNotaScreen(navController: NavController) { // ESTA ES LA FUNCIÓN QU
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Botón de Exportar
+            Button(
+                onClick = {
+                    navController.navigate(AppScreens.ExportScreen.route)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF018786))
+            ) {
+                Text("Exportar Nota", color = Color.White)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Botón de Guardar
             Button(

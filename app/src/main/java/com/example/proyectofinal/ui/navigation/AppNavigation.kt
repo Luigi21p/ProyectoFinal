@@ -9,7 +9,7 @@ import com.example.proyectofinal.ui.screens.LoginScreen
 import com.example.proyectofinal.ui.screens.DashboardScreen
 import com.example.proyectofinal.ui.screens.SettingsScreen
 import com.example.proyectofinal.ui.screens.RedactarNotaScreen
-
+import com.example.proyectofinal.ui.screens.ExportScreen
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -28,6 +28,11 @@ fun AppNavigation() {
         }
         composable(AppScreens.SettingsScreen.route) {
             SettingsScreen(navController)
+        }
+        composable(AppScreens.ExportScreen.route) {
+            ExportScreen(
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }
