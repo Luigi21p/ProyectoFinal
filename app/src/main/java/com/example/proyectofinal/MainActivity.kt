@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.proyectofinal.ui.navigation.AppNavigation
+import com.example.proyectofinal.navigation.AppNavigation
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 class MainActivity : ComponentActivity() {
@@ -12,7 +12,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ProyectoFinalTheme {
+            _root_ide_package_.com.example.proyectofinal.ui.theme.ProyectoFinalTheme {
                 AppNavigation()
             }
         }

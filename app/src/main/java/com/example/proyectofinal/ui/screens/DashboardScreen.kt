@@ -24,15 +24,19 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.proyectofinal.ui.navigation.AppScreens
+import com.example.proyectofinal.navigation.AppScreens
+import androidx.compose.ui.res.painterResource
+import com.example.proyectofinal.R
+import com.google.firebase.auth.auth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
-
     var filtroSeleccionado by remember { mutableStateOf("Todas") }
+    // Nuevo estado para controlar si el menú del botón flotante está abierto o cerrado
+    var isFabExpanded by remember { mutableStateOf(false) }
 
     val categorias = listOf("Todas", "Trabajo", "Personales", "Compras", "Ideas")
 
@@ -44,7 +48,10 @@ fun DashboardScreen(navController: NavController) {
             confirmButton = {
                 TextButton(onClick = {
                     showDialog = false
-                    navController.popBackStack()
+                    com.google.firebase.Firebase.auth.signOut()  // 👈 logout real de Firebase
+                    navController.navigate(AppScreens.LoginScreen.route) {
+                        popUpTo(0) { inclusive = true }  // 👈 limpia todo el backstack
+                    }
                 }) { Text("Sí, salir") }
             },
             dismissButton = {
@@ -71,16 +78,56 @@ fun DashboardScreen(navController: NavController) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    // Cambia "CategoriesScreen" por la ruta de redactar nota
-                    navController.navigate(AppScreens.RedactarNotaScreen.route)
-                },
-                containerColor = Color(0xFF03DAC5),
-                contentColor = Color.White,
-                shape = CircleShape
+            // Columna que agrupa las opciones del botón flotante (FAB Múltiple)
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Nueva Nota")
+                // Si está expandido, mostramos las dos opciones superiores secundarias
+                if (isFabExpanded) {
+                    // Opción 1: Crear Nota Normal de Texto
+                    SmallFloatingActionButton(
+                        onClick = {
+                            isFabExpanded = false
+                            navController.navigate(AppScreens.RedactarNotaScreen.route)
+                        },
+                        containerColor = Color(0xFF6200EE),
+                        contentColor = Color.White,
+                        shape = CircleShape
+                    ) {
+                        Text("📝", fontSize = 18.sp)
+                    }
+
+                    // Opción 2: Crear Nota con Imagen / Cámara
+                    SmallFloatingActionButton(
+                        onClick = {
+                            isFabExpanded = false
+                            navController.navigate(AppScreens.PhotoNoteScreen.route)
+                        },
+                        containerColor = Color(0xFF018786),
+                        contentColor = Color.White,
+                        shape = CircleShape
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_camera),
+                            contentDescription = "Nota con foto",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+
+                // El botón principal "+" que abre y cierra el menú flotante
+                FloatingActionButton(
+                    onClick = { isFabExpanded = !isFabExpanded },
+                    containerColor = Color(0xFF03DAC5),
+                    contentColor = Color.White,
+                    shape = CircleShape
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Desplegar opciones"
+                    )
+                }
             }
         }
     ) { padding ->
