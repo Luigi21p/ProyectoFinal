@@ -115,7 +115,7 @@ fun HomeScreen(
                         text = "No hay notas aún\nPresiona + para crear una",
                         color = Color.Gray,
                         fontSize = 16.sp,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = TextAlign.Center
                     )
                 }
             } else {
