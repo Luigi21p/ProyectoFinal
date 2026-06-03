@@ -10,9 +10,11 @@ import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+
         setContent {
-            _root_ide_package_.com.example.proyectofinal.ui.theme.ProyectoFinalTheme {
+            ProyectoFinalTheme {
                 AppNavigation()
             }
         }
