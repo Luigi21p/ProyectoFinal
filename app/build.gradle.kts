@@ -75,10 +75,15 @@ dependencies {
     // ViewModel Compose — solo una vez
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 
+<<<<<<< HEAD
     // Core KTX — solo una vez
     implementation("androidx.core:core-ktx:1.12.0")
 
     // Tests
+=======
+    implementation("com.google.code.gson:gson:2.10.1")
+
+>>>>>>> origin/master
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

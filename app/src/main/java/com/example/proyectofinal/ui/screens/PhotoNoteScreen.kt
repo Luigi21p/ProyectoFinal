@@ -162,7 +162,10 @@ fun PhotoNoteScreen(
                 }
             }
 
+<<<<<<< HEAD
             // Botones cámara y galería
+=======
+>>>>>>> origin/master
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -183,7 +186,11 @@ fun PhotoNoteScreen(
                 }
             }
 
+<<<<<<< HEAD
             // Contenido de la nota
+=======
+
+>>>>>>> origin/master
             OutlinedTextField(
                 value = noteContent,
                 onValueChange = { noteContent = it },
@@ -193,6 +200,7 @@ fun PhotoNoteScreen(
                     .height(150.dp)
             )
 
+<<<<<<< HEAD
             // Botón anotar
             Button(
                 onClick = onAnnotateClick,
@@ -202,6 +210,12 @@ fun PhotoNoteScreen(
             ) {
                 Text("✏️ ANOTAR IMAGEN")
             }
+=======
+
+            Text("Categoría", style = MaterialTheme.typography.labelLarge)
+
+
+>>>>>>> origin/master
         }
     }
 }

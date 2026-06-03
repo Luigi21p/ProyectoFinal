@@ -10,5 +10,8 @@ sealed class AppScreens(val route: String) {
     object PhotoNoteScreen : AppScreens("photo_note_screen")
     object PhotoAnnotationScreen : AppScreens("photo_annotation_screen")
 
+<<<<<<< HEAD
     object DrawingScreen : AppScreens("drawing")
+=======
+>>>>>>> origin/master
 }

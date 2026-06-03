@@ -35,10 +35,16 @@ fun PhotoAnnotationScreen(
     onBackClick: () -> Unit = {},
     onConfirmClick: () -> Unit = {}
 ) {
+<<<<<<< HEAD
     val imageViewModel: ImageViewModel = viewModel()
     val originalImage by imageViewModel.selectedImage.observeAsState()
     val paths = remember { mutableStateListOf<DrawPath>() }
     var currentPath by remember { mutableStateOf<DrawPath?>(null) }
+=======
+
+    var selectedTool by remember { mutableStateOf("Dibujar") }
+
+>>>>>>> origin/master
     var selectedColor by remember { mutableStateOf(Color.Red) }
 
     val colors = listOf(Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Black)
@@ -71,7 +77,11 @@ fun PhotoAnnotationScreen(
                 .padding(paddingValues)
                 .background(Color.Black)
         ) {
+<<<<<<< HEAD
             // Barra de colores
+=======
+
+>>>>>>> origin/master
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -80,6 +90,7 @@ fun PhotoAnnotationScreen(
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+<<<<<<< HEAD
                 colors.forEach { color ->
                     Box(
                         modifier = Modifier
@@ -89,6 +100,32 @@ fun PhotoAnnotationScreen(
                                 width = if (selectedColor == color) 3.dp else 0.dp,
                                 color = Color.White,
                                 shape = CircleShape
+=======
+
+                ToolButton(label = "Texto", isSelected = selectedTool == "Texto") { selectedTool = "Texto" }
+
+                ToolButton(label = "Dibujar", isSelected = selectedTool == "Dibujar") { selectedTool = "Dibujar" }
+
+                ToolButton(label = "Efecto", isSelected = selectedTool == "Efecto") { selectedTool = "Efecto" }
+
+                ToolButton(label = "Resaltar", isSelected = selectedTool == "Resaltar") { selectedTool = "Resaltar" }
+
+                VerticalDivider(modifier = Modifier.height(30.dp), color = Color.Gray)
+
+                colorsList.forEach { color ->
+                    IconButton(
+                        onClick = { selectedColor = color },
+                        modifier = Modifier
+                            .size(24.dp)
+                            .background(color, shape = CircleShape)
+                            .padding(2.dp)
+                    ) {
+                        if (selectedColor == color) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Gray.copy(alpha = 0.6f), shape = CircleShape)
+>>>>>>> origin/master
                             )
                     ) {
                         IconButton(
@@ -99,8 +136,18 @@ fun PhotoAnnotationScreen(
                 }
             }
 
+<<<<<<< HEAD
             // Área de dibujo
             Box(modifier = Modifier.weight(1f)) {
+=======
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+
+>>>>>>> origin/master
                 Canvas(
                     modifier = Modifier
                         .fillMaxSize()
@@ -123,6 +170,7 @@ fun PhotoAnnotationScreen(
                             )
                         }
                 ) {
+<<<<<<< HEAD
                     // drawImage con dstOffset e dstSize correctos
                     originalImage?.let { bitmap ->
                         drawImage(
@@ -131,6 +179,10 @@ fun PhotoAnnotationScreen(
                             dstSize = IntSize(size.width.toInt(), size.height.toInt())
                         )
                     }
+=======
+
+                }
+>>>>>>> origin/master
 
                     paths.forEach { path ->
                         drawPathWithPoints(path.points, path.color)
@@ -142,7 +194,10 @@ fun PhotoAnnotationScreen(
                 }
             }
 
+<<<<<<< HEAD
             // Botones
+=======
+>>>>>>> origin/master
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -164,6 +219,7 @@ fun PhotoAnnotationScreen(
     }
 }
 
+<<<<<<< HEAD
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawPathWithPoints(
     points: List<Offset>,
     color: Color
@@ -173,6 +229,20 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawPathWithPoints(
     path.moveTo(points.first().x, points.first().y)
     for (i in 1 until points.size) {
         path.lineTo(points[i].x, points[i].y)
+=======
+
+@Composable
+fun ToolButton(label: String, isSelected: Boolean, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isSelected) Color(0xFF6200EE) else Color.DarkGray
+        ),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+        modifier = Modifier.height(36.dp)
+    ) {
+        Text(text = label, fontSize = 12.sp, color = Color.White)
+>>>>>>> origin/master
     }
     drawPath(path = path, color = color, style = Stroke(width = 12f))
 }

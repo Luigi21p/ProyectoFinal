@@ -1,36 +1,80 @@
 package com.example.proyectofinal.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.R
+import com.example.proyectofinal.viewmodel.ExportState
+import com.example.proyectofinal.viewmodel.ExportViewModel
+import com.example.proyectofinal.viewmodel.NoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExportScreen(
-    noteTitle: String = "Mi Nota",
-    onBack: () -> Unit = {}
+    onBack: () -> Unit,
+    noteViewModel: NoteViewModel = viewModel(),
+    exportViewModel: ExportViewModel = viewModel()
 ) {
-    var selectedFormat by remember { mutableStateOf<String?>(null) }
-    var showConfirmDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val notes by noteViewModel.notes.observeAsState(initial = emptyList())
+    val exportState by exportViewModel.exportState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(exportState) {
+        when (exportState) {
+            is ExportState.Success -> {
+                val json = (exportState as ExportState.Success).json
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "application/json"
+                    putExtra(Intent.EXTRA_TEXT, json)
+                    putExtra(Intent.EXTRA_SUBJECT, "respaldo_notas.json")
+                }
+                val chooser = Intent.createChooser(intent, "Guardar o compartir notas").apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(chooser)
+            }
+            is ExportState.Error -> {
+                snackbarHostState.showSnackbar(
+                    (exportState as ExportState.Error).message
+                )
+            }
+            else -> Unit
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Exportar Nota") },
+                title = {
+                    Text(
+                        stringResource(R.string.export_title),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Default.ArrowBack, contentDescription = null, tint = Color.White)
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF6200EE)
+                )
             )
         }
     ) { padding ->
@@ -38,128 +82,72 @@ fun ExportScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Título de la nota
             Text(
-                text = "Nota: \"$noteTitle\"",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = stringResource(R.string.export_json_desc),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            Divider()
-
-            Text(
-                text = "Selecciona el formato de exportación:",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Botón Markdown
-            ExportFormatButton(
-                label = "Markdown (.md)",
-                description = "Ideal para documentación y GitHub",
-                icon = "📝",
-                color = Color(0xFF6200EE),
-                isSelected = selectedFormat == "Markdown",
-                onClick = {
-                    selectedFormat = "Markdown"
-                    showConfirmDialog = true
-                }
-            )
-
-            // Botón PDF
-            ExportFormatButton(
-                label = "PDF (.pdf)",
-                description = "Para compartir e imprimir",
-                icon = "📄",
-                color = Color(0xFFB00020),
-                isSelected = selectedFormat == "PDF",
-                onClick = {
-                    selectedFormat = "PDF"
-                    showConfirmDialog = true
-                }
-            )
-
-            // Botón JSON
-            ExportFormatButton(
-                label = "Ticket de Tarea (.json)",
-                description = "Formato estructurado para integración",
-                icon = "🔧",
-                color = Color(0xFF018786),
-                isSelected = selectedFormat == "JSON",
-                onClick = {
-                    selectedFormat = "JSON"
-                    showConfirmDialog = true
-                }
-            )
-        }
-
-        // Dialog de confirmación (solo visual por ahora)
-        if (showConfirmDialog && selectedFormat != null) {
-            AlertDialog(
-                onDismissRequest = { showConfirmDialog = false },
-                title = { Text("Exportar como $selectedFormat") },
-                text = { Text("La exportación en $selectedFormat estará disponible próximamente.") },
-                confirmButton = {
-                    TextButton(onClick = { showConfirmDialog = false }) {
-                        Text("Aceptar")
+            when (exportState) {
+                is ExportState.Idle -> {
+                    Button(
+                        onClick = { exportViewModel.exportNotes(notes) },
+                        enabled = notes.isNotEmpty(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF6200EE)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.export_as, "JSON (${notes.size})"))
                     }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showConfirmDialog = false }) {
-                        Text("Cancelar")
+                    if (notes.isEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.no_notes),
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                 }
-            )
-        }
-    }
-}
 
-@Composable
-fun ExportFormatButton(
-    label: String,
-    description: String,
-    icon: String,
-    color: Color,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val borderColor = if (isSelected) color else Color.LightGray
-    val containerColor = if (isSelected) color.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface
+                is ExportState.Loading -> {
+                    CircularProgressIndicator(color = Color(0xFF6200EE))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(stringResource(R.string.export_select_format))
+                }
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        border = androidx.compose.foundation.BorderStroke(2.dp, borderColor),
-        onClick = onClick
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(text = icon, fontSize = 32.sp)
+                is ExportState.Success -> {
+                    Text(
+                        text = "✅ ${stringResource(R.string.export_json_desc)}",
+                        color = Color(0xFF388E3C),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    OutlinedButton(
+                        onClick = { exportViewModel.resetState() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.export_as, "JSON"))
+                    }
+                }
 
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = label,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = color
-                )
-                Text(
-                    text = description,
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                is ExportState.Error -> {
+                    Text(
+                        text = "❌ ${stringResource(R.string.export_title)}",
+                        color = Color.Red,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    Button(
+                        onClick = { exportViewModel.resetState() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.export_accept))
+                    }
+                }
             }
         }
     }

@@ -11,7 +11,11 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
+<<<<<<< HEAD
 import androidx.compose.material.icons.filled.Settings
+=======
+import androidx.compose.material.icons.filled.Share
+>>>>>>> origin/master
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -46,9 +50,12 @@ fun HomeScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("Todas") }
 
+<<<<<<< HEAD
     //  Control del FAB expandido
     var fabExpanded by remember { mutableStateOf(false) }
 
+=======
+>>>>>>> origin/master
     val categoriasMap = listOf(
         R.string.tab_all        to "Todas",
         R.string.tab_personal   to "Personal",
@@ -94,6 +101,15 @@ fun HomeScreen(
                         Icon(
                             painter = painterResource(R.drawable.ic_image),
                             contentDescription = "Nota con imagen",
+                            tint = Color.White
+                        )
+                    }
+                    IconButton(onClick = {
+                        navController.navigate(AppScreens.ExportScreen.route)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Exportar notas",
                             tint = Color.White
                         )
                     }
@@ -249,7 +265,11 @@ fun HomeScreen(
                             if (categoriaId == "Todas") viewModel.loadNotes()
                             else viewModel.filterByCategory(categoriaId)
                         },
+<<<<<<< HEAD
                         text = { Text(stringResource(id = stringRes)) }
+=======
+                        text = { Text(text = stringResource(id = stringRes)) }
+>>>>>>> origin/master
                     )
                 }
             }
@@ -339,8 +359,13 @@ fun NoteCard(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
+<<<<<<< HEAD
                 val categoryText = when (note.category.trim()) {
                     "Personal"    -> stringResource(id = R.string.tab_personal)
+=======
+                val categoryText = when(note.category.trim()) {
+                    "Personal" -> stringResource(id = R.string.tab_personal)
+>>>>>>> origin/master
                     "Universidad" -> stringResource(id = R.string.tab_university)
                     "Trabajo"     -> stringResource(id = R.string.tab_work)
                     "Ideas"       -> stringResource(id = R.string.tab_ideas)
