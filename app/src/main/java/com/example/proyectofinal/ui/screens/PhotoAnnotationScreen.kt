@@ -23,9 +23,9 @@ fun PhotoAnnotationScreen(
     onBackClick: () -> Unit = {},
     onConfirmClick: () -> Unit = {}
 ) {
-    // Estado para saber qué herramienta está seleccionada (Texto, Dibujar, Borrar, etc.)
+
     var selectedTool by remember { mutableStateOf("Dibujar") }
-    // Estado para el color seleccionado de la paleta
+
     var selectedColor by remember { mutableStateOf(Color.Red) }
 
     val colorsList = listOf(Color.Red, Color.Yellow, Color.Green, Color.Blue, Color.White, Color.Black)
@@ -63,30 +63,29 @@ fun PhotoAnnotationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color.Black) // Fondo oscuro para resaltar la foto/lienzo
+                .background(Color.Black)
         ) {
-            // 1. BARRA DE HERRAMIENTAS (Fila con Scroll Horizontal)
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF212121)) // Gris oscuro
+                    .background(Color(0xFF212121))
                     .padding(8.dp)
                     .horizontalScroll(rememberScrollState()),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Botón Texto
+
                 ToolButton(label = "Texto", isSelected = selectedTool == "Texto") { selectedTool = "Texto" }
-                // Botón Dibujar
+
                 ToolButton(label = "Dibujar", isSelected = selectedTool == "Dibujar") { selectedTool = "Dibujar" }
-                // Botón Efecto
+
                 ToolButton(label = "Efecto", isSelected = selectedTool == "Efecto") { selectedTool = "Efecto" }
-                // Botón Recortar/Resaltar
+
                 ToolButton(label = "Resaltar", isSelected = selectedTool == "Resaltar") { selectedTool = "Resaltar" }
 
                 VerticalDivider(modifier = Modifier.height(30.dp), color = Color.Gray)
 
-                // PALETA DE COLORES rápidos
                 colorsList.forEach { color ->
                     IconButton(
                         onClick = { selectedColor = color },
@@ -96,7 +95,6 @@ fun PhotoAnnotationScreen(
                             .padding(2.dp)
                     ) {
                         if (selectedColor == color) {
-                            // Pequeña marca si está seleccionado
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -107,21 +105,19 @@ fun PhotoAnnotationScreen(
                 }
             }
 
-            // 2. ÁREA DEL LIENZO / CANVAS (Ocupa el espacio disponible)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                // Aquí se dibujará la imagen de fondo más adelante.
-                // Por ahora, el Canvas estructural que sustituye al 'annotationCanvas' del XML
+
                 Canvas(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color(0xFF1C1C1C))
                 ) {
-                    // Aquí irá la lógica de dibujo (DrawScope) con las coordenadas de los dedos
+
                 }
 
                 Text(
@@ -131,7 +127,6 @@ fun PhotoAnnotationScreen(
                 )
             }
 
-            // 3. BARRA INFERIOR DE ACCIONES (Guardar / Cancelar)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -157,7 +152,7 @@ fun PhotoAnnotationScreen(
     }
 }
 
-// Componente auxiliar para los botones de herramientas superiores
+
 @Composable
 fun ToolButton(label: String, isSelected: Boolean, onClick: () -> Unit) {
     Button(

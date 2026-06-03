@@ -81,7 +81,6 @@ fun PhotoNoteScreen(onBackClick: () -> Unit = {}) {
                 }
             }
 
-            // Botones de acción de la imagen (Fila Horizontal)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -100,7 +99,7 @@ fun PhotoNoteScreen(onBackClick: () -> Unit = {}) {
                 }
             }
 
-            // Campo de la Nota
+
             OutlinedTextField(
                 value = noteContent,
                 onValueChange = { noteContent = it },
@@ -111,10 +110,10 @@ fun PhotoNoteScreen(onBackClick: () -> Unit = {}) {
                     .height(150.dp)
             )
 
-            // Espacio inferior para el Spinner/Categorías que tiene abajo
+
             Text("Categoría", style = MaterialTheme.typography.labelLarge)
 
-            // Aquí se puede agregar un ExposedDropdownMenuBox más adelante para el Spinner.
+
         }
     }
 }

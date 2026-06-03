@@ -35,7 +35,10 @@ fun AppNavigation() {
             SettingsScreen(navController)
         }
         composable(AppScreens.ExportScreen.route) {
-            ExportScreen(onBack = { navController.popBackStack() })
+            ExportScreen(
+                onBack = { navController.popBackStack() },
+                noteViewModel = noteViewModel
+            )
         }
         composable(AppScreens.PhotoNoteScreen.route) {
             PhotoNoteScreen(onBackClick = { navController.popBackStack() })

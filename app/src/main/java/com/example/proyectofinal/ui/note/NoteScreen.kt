@@ -11,7 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext // 💡 Importación necesaria
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.R
 import com.example.proyectofinal.viewmodel.NoteViewModel
-import com.example.proyectofinal.utils.NotificationHelper // 💡 Importación necesaria
+import com.example.proyectofinal.utils.NotificationHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +28,7 @@ fun NoteScreen(
     onBack: () -> Unit,
     viewModel: NoteViewModel = viewModel()
 ) {
-    val context = LocalContext.current // 💡 Capturamos el contexto para la notificación
+    val context = LocalContext.current
     val selectedNote by viewModel.selectedNote.observeAsState()
 
     var title by remember { mutableStateOf("") }

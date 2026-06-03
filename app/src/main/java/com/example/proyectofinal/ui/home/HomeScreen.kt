@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -44,7 +45,6 @@ fun HomeScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("Todas") }
 
-    // Estructura clave: Vincula el recurso traducible con el ID interno fijo en la BD
     val categoriasMap = listOf(
         R.string.tab_all to "Todas",
         R.string.tab_personal to "Personal",
@@ -84,6 +84,15 @@ fun HomeScreen(
                 },
                 actions = {
                     IconButton(onClick = {
+                        navController.navigate(AppScreens.ExportScreen.route)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Exportar notas",
+                            tint = Color.White
+                        )
+                    }
+                    IconButton(onClick = {
                         navController.navigate(AppScreens.SettingsScreen.route)
                     }) {
                         Icon(
@@ -113,7 +122,6 @@ fun HomeScreen(
                 .padding(padding)
                 .background(Color(0xFFF5F5F5))
         ) {
-            // Filtro de categorías solucionado
             ScrollableTabRow(
                 selectedTabIndex = categoriasMap.map { it.second }.indexOf(selectedCategory).coerceAtLeast(0),
                 containerColor = Color.White,
@@ -127,12 +135,11 @@ fun HomeScreen(
                             if (categoriaId == "Todas") viewModel.loadNotes()
                             else viewModel.filterByCategory(categoriaId)
                         },
-                        text = { Text(text = stringResource(id = stringRes)) } // 🌎 Renderizado dinámico real de la UI
+                        text = { Text(text = stringResource(id = stringRes)) }
                     )
                 }
             }
 
-            // Barra de búsqueda
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = {
@@ -151,7 +158,6 @@ fun HomeScreen(
                 singleLine = true
             )
 
-            // Lista de notas
             if (notes.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -218,7 +224,6 @@ fun NoteCard(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Conversión forzada del String plano de Firebase al ID internacionalizado del XML
                 val categoryText = when(note.category.trim()) {
                     "Personal" -> stringResource(id = R.string.tab_personal)
                     "Universidad" -> stringResource(id = R.string.tab_university)
@@ -229,7 +234,7 @@ fun NoteCard(
                 }
 
                 Text(
-                    text = categoryText, // 🌎 Muestra el texto traducido en el badge
+                    text = categoryText,
                     fontSize = 11.sp,
                     color = Color.White,
                     modifier = Modifier
