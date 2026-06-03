@@ -2,33 +2,46 @@ package com.example.proyectofinal.ui.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.R
+import com.example.proyectofinal.viewmodel.ImageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoAnnotationScreen(
+    onLaunchCamera: () -> Unit = {},
+    onLaunchGallery: () -> Unit = {},
     onBackClick: () -> Unit = {},
     onConfirmClick: () -> Unit = {}
 ) {
-    // Estado para saber qué herramienta está seleccionada (Texto, Dibujar, Borrar, etc.)
-    var selectedTool by remember { mutableStateOf("Dibujar") }
-    // Estado para el color seleccionado de la paleta
+    val imageViewModel: ImageViewModel = viewModel()
+    val originalImage by imageViewModel.selectedImage.observeAsState()
+    val paths = remember { mutableStateListOf<DrawPath>() }
+    var currentPath by remember { mutableStateOf<DrawPath?>(null) }
     var selectedColor by remember { mutableStateOf(Color.Red) }
 
-    val colorsList = listOf(Color.Red, Color.Yellow, Color.Green, Color.Blue, Color.White, Color.Black)
+    val colors = listOf(Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Black)
 
     Scaffold(
         topBar = {
@@ -36,25 +49,18 @@ fun PhotoAnnotationScreen(
                 title = { Text("Anotar imagen", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_back),
-                            contentDescription = "Atrás"
-                        )
+                        Icon(painterResource(R.drawable.ic_arrow_back), "Atrás")
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Acción borrar todo */ }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_delete),
-                            contentDescription = "Borrar todo"
-                        )
+                    IconButton(onClick = { paths.clear() }) {
+                        Icon(painterResource(R.drawable.ic_delete), "Borrar")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF6200EE),
                     titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    navigationIconContentColor = Color.White
                 )
             )
         }
@@ -63,111 +69,115 @@ fun PhotoAnnotationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color.Black) // Fondo oscuro para resaltar la foto/lienzo
+                .background(Color.Black)
         ) {
-            // 1. BARRA DE HERRAMIENTAS (Fila con Scroll Horizontal)
+            // Barra de colores
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF212121)) // Gris oscuro
+                    .background(Color(0xFF212121))
                     .padding(8.dp)
                     .horizontalScroll(rememberScrollState()),
-                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Botón Texto
-                ToolButton(label = "Texto", isSelected = selectedTool == "Texto") { selectedTool = "Texto" }
-                // Botón Dibujar
-                ToolButton(label = "Dibujar", isSelected = selectedTool == "Dibujar") { selectedTool = "Dibujar" }
-                // Botón Efecto
-                ToolButton(label = "Efecto", isSelected = selectedTool == "Efecto") { selectedTool = "Efecto" }
-                // Botón Recortar/Resaltar
-                ToolButton(label = "Resaltar", isSelected = selectedTool == "Resaltar") { selectedTool = "Resaltar" }
-
-                VerticalDivider(modifier = Modifier.height(30.dp), color = Color.Gray)
-
-                // PALETA DE COLORES rápidos
-                colorsList.forEach { color ->
-                    IconButton(
-                        onClick = { selectedColor = color },
+                colors.forEach { color ->
+                    Box(
                         modifier = Modifier
-                            .size(24.dp)
-                            .background(color, shape = CircleShape)
-                            .padding(2.dp)
-                    ) {
-                        if (selectedColor == color) {
-                            // Pequeña marca si está seleccionado
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Gray.copy(alpha = 0.6f), shape = CircleShape)
+                            .size(40.dp)
+                            .background(color, CircleShape)
+                            .border(                              // ✅ import ya agregado arriba
+                                width = if (selectedColor == color) 3.dp else 0.dp,
+                                color = Color.White,
+                                shape = CircleShape
                             )
-                        }
+                    ) {
+                        IconButton(
+                            onClick = { selectedColor = color },
+                            modifier = Modifier.fillMaxSize()
+                        ) {}
                     }
                 }
             }
 
-            // 2. ÁREA DEL LIENZO / CANVAS (Ocupa el espacio disponible)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                // Aquí se dibujará la imagen de fondo más adelante.
-                // Por ahora, el Canvas estructural que sustituye al 'annotationCanvas' del XML
+            // Área de dibujo
+            Box(modifier = Modifier.weight(1f)) {
                 Canvas(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(0xFF1C1C1C))
+                        .background(Color.DarkGray)
+                        .pointerInput(Unit) {
+                            detectDragGestures(
+                                onDragStart = { offset ->
+                                    currentPath = DrawPath(selectedColor, mutableListOf(offset))
+                                },
+                                onDrag = { change, _ ->
+                                    currentPath?.points?.add(change.position)
+                                    change.consume()
+                                },
+                                onDragEnd = {
+                                    currentPath?.let {
+                                        if (it.points.size > 1) paths.add(it)
+                                    }
+                                    currentPath = null
+                                }
+                            )
+                        }
                 ) {
-                    // Aquí irá la lógica de dibujo (DrawScope) con las coordenadas de los dedos
-                }
+                    // drawImage con dstOffset e dstSize correctos
+                    originalImage?.let { bitmap ->
+                        drawImage(
+                            image = bitmap.asImageBitmap(),
+                            dstOffset = IntOffset.Zero,
+                            dstSize = IntSize(size.width.toInt(), size.height.toInt())
+                        )
+                    }
 
-                Text(
-                    text = "Área de edición de imagen",
-                    color = Color.White.copy(alpha = 0.4f),
-                    fontSize = 14.sp
-                )
+                    paths.forEach { path ->
+                        drawPathWithPoints(path.points, path.color)
+                    }
+
+                    currentPath?.let {
+                        drawPathWithPoints(it.points, it.color)
+                    }
+                }
             }
 
-            // 3. BARRA INFERIOR DE ACCIONES (Guardar / Cancelar)
+            // Botones
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                OutlinedButton(
-                    onClick = onBackClick,
-                    modifier = Modifier.weight(1.0f),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-                ) {
+                OutlinedButton(onClick = onBackClick, modifier = Modifier.weight(1f)) {
                     Text("CANCELAR")
                 }
                 Button(
                     onClick = onConfirmClick,
-                    modifier = Modifier.weight(1.0f),
+                    modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
                 ) {
-                    Text("GUARDAR ANOTACIÓN")
+                    Text("GUARDAR")
                 }
             }
         }
     }
 }
 
-// Componente auxiliar para los botones de herramientas superiores
-@Composable
-fun ToolButton(label: String, isSelected: Boolean, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color(0xFF6200EE) else Color.DarkGray
-        ),
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-        modifier = Modifier.height(36.dp)
-    ) {
-        Text(text = label, fontSize = 12.sp, color = Color.White)
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawPathWithPoints(
+    points: List<Offset>,
+    color: Color
+) {
+    if (points.size < 2) return
+    val path = Path()
+    path.moveTo(points.first().x, points.first().y)
+    for (i in 1 until points.size) {
+        path.lineTo(points[i].x, points[i].y)
     }
+    drawPath(path = path, color = color, style = Stroke(width = 12f))
 }
+
+data class DrawPath(
+    val color: Color,
+    val points: MutableList<Offset>
+)

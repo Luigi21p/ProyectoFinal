@@ -11,13 +11,17 @@ import com.example.proyectofinal.ui.screens.SettingsScreen
 import com.example.proyectofinal.ui.screens.ExportScreen
 import com.example.proyectofinal.ui.screens.PhotoAnnotationScreen
 import com.example.proyectofinal.ui.screens.PhotoNoteScreen
+import com.example.proyectofinal.ui.screens.DrawingScreen
 import com.example.proyectofinal.ui.home.HomeScreen
 import com.example.proyectofinal.ui.note.NoteScreen
 import com.example.proyectofinal.viewmodel.NoteViewModel
 import com.example.proyectofinal.data.model.NoteModel
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    onLaunchCamera: () -> Unit = {},
+    onLaunchGallery: () -> Unit = {}
+) {
     val navController = rememberNavController()
     val noteViewModel: NoteViewModel = viewModel()
 
@@ -37,15 +41,32 @@ fun AppNavigation() {
         composable(AppScreens.ExportScreen.route) {
             ExportScreen(onBack = { navController.popBackStack() })
         }
+
+        // PhotoNoteScreen
         composable(AppScreens.PhotoNoteScreen.route) {
-            PhotoNoteScreen(onBackClick = { navController.popBackStack() })
+            PhotoNoteScreen(
+                onBackClick = { navController.popBackStack() },
+                onLaunchCamera = onLaunchCamera,
+                onLaunchGallery = onLaunchGallery,
+                onAnnotateClick = { navController.navigate(AppScreens.PhotoAnnotationScreen.route) }
+            )
         }
+
+        // PhotoAnnotationScreen
         composable(AppScreens.PhotoAnnotationScreen.route) {
             PhotoAnnotationScreen(
                 onBackClick = { navController.popBackStack() },
                 onConfirmClick = { navController.popBackStack() }
             )
         }
+
+        // ✅ DrawingScreen CORREGIDO (sin onSaveClick)
+        composable("drawing") {
+            DrawingScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
         composable("home") {
             HomeScreen(
                 navController = navController,
@@ -60,6 +81,7 @@ fun AppNavigation() {
                 viewModel = noteViewModel
             )
         }
+
         composable("note") {
             NoteScreen(
                 onBack = { navController.popBackStack() },

@@ -9,5 +9,6 @@ sealed class AppScreens(val route: String) {
     object ExportScreen : AppScreens("export_screen")
     object PhotoNoteScreen : AppScreens("photo_note_screen")
     object PhotoAnnotationScreen : AppScreens("photo_annotation_screen")
-    // Los integrantes 2, 3 y 4 agregan sus rutas aquí abajo
+
+    object DrawingScreen : AppScreens("drawing")
 }

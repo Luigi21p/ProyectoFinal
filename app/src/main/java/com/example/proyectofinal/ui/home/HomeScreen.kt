@@ -8,27 +8,29 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.proyectofinal.data.model.NoteModel
-import com.example.proyectofinal.viewmodel.NoteViewModel
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Settings
 import androidx.navigation.NavController
-import com.example.proyectofinal.navigation.AppScreens
 import com.example.proyectofinal.R
+import com.example.proyectofinal.data.model.NoteModel
+import com.example.proyectofinal.navigation.AppScreens
+import com.example.proyectofinal.viewmodel.NoteViewModel
+import androidx.compose.material.icons.filled.Edit
 
 val Purple = Color(0xFF6200EE)
 
@@ -44,14 +46,16 @@ fun HomeScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("Todas") }
 
-    // Estructura clave: Vincula el recurso traducible con el ID interno fijo en la BD
+    //  Control del FAB expandido
+    var fabExpanded by remember { mutableStateOf(false) }
+
     val categoriasMap = listOf(
-        R.string.tab_all to "Todas",
-        R.string.tab_personal to "Personal",
+        R.string.tab_all        to "Todas",
+        R.string.tab_personal   to "Personal",
         R.string.tab_university to "Universidad",
-        R.string.tab_work to "Trabajo",
-        R.string.tab_ideas to "Ideas",
-        R.string.tab_other to "Otro"
+        R.string.tab_work       to "Trabajo",
+        R.string.tab_ideas      to "Ideas",
+        R.string.tab_other      to "Otro"
     )
 
     Scaffold(
@@ -83,6 +87,16 @@ fun HomeScreen(
                     }
                 },
                 actions = {
+                    // ✅ Botón directo a PhotoNoteScreen en el TopBar
+                    IconButton(onClick = {
+                        navController.navigate(AppScreens.PhotoNoteScreen.route)
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_image),
+                            contentDescription = "Nota con imagen",
+                            tint = Color.White
+                        )
+                    }
                     IconButton(onClick = {
                         navController.navigate(AppScreens.SettingsScreen.route)
                     }) {
@@ -99,11 +113,119 @@ fun HomeScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddNote,
-                containerColor = Purple
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Nueva nota", tint = Color.White)
+                // Mini FABs que aparecen al expandir
+                if (fabExpanded) {
+                    // Opción: nota con foto
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color(0xFF212121),
+                            tonalElevation = 4.dp
+                        ) {
+                            Text(
+                                text = "Nota con imagen",
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                fontSize = 13.sp
+                            )
+                        }
+                        SmallFloatingActionButton(
+                            onClick = {
+                                fabExpanded = false
+                                navController.navigate(AppScreens.PhotoNoteScreen.route)
+                            },
+                            containerColor = Purple
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_image),
+                                contentDescription = "Nota con imagen",
+                                tint = Color.White
+                            )
+                        }
+                    }
+
+                    // Opción: nota de texto
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color(0xFF212121),
+                            tonalElevation = 4.dp
+                        ) {
+                            Text(
+                                text = "Nota de texto",
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                fontSize = 13.sp
+                            )
+                        }
+                        SmallFloatingActionButton(
+                            onClick = {
+                                fabExpanded = false
+                                onAddNote()
+                            },
+                            containerColor = Purple
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Nueva nota",
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
+
+                //  FAB principal — abre/cierra el menú
+                FloatingActionButton(
+                    onClick = { fabExpanded = !fabExpanded },
+                    containerColor = Purple
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Agregar",
+                        tint = Color.White
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = Color(0xFF212121),
+                        tonalElevation = 4.dp
+                    ) {
+                        Text(
+                            text = "Dibujo libre",
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            fontSize = 13.sp
+                        )
+                    }
+                    SmallFloatingActionButton(
+                        onClick = {
+                            fabExpanded = false
+                            navController.navigate("drawing")  //  Navegar a pantalla de dibujo
+                        },
+                        containerColor = Purple
+                    ) {
+                        Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = "Dibujo libre",
+                        tint = Color.White
+                    )
+
+                    }
+                }
             }
         }
     ) { padding ->
@@ -113,11 +235,11 @@ fun HomeScreen(
                 .padding(padding)
                 .background(Color(0xFFF5F5F5))
         ) {
-            // Filtro de categorías solucionado
             ScrollableTabRow(
-                selectedTabIndex = categoriasMap.map { it.second }.indexOf(selectedCategory).coerceAtLeast(0),
+                selectedTabIndex = categoriasMap.map { it.second }
+                    .indexOf(selectedCategory).coerceAtLeast(0),
                 containerColor = Color.White,
-                contentColor = Color(0xFF6200EE)
+                contentColor = Purple
             ) {
                 categoriasMap.forEach { (stringRes, categoriaId) ->
                     Tab(
@@ -127,12 +249,11 @@ fun HomeScreen(
                             if (categoriaId == "Todas") viewModel.loadNotes()
                             else viewModel.filterByCategory(categoriaId)
                         },
-                        text = { Text(text = stringResource(id = stringRes)) } // 🌎 Renderizado dinámico real de la UI
+                        text = { Text(stringResource(id = stringRes)) }
                     )
                 }
             }
 
-            // Barra de búsqueda
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = {
@@ -151,7 +272,6 @@ fun HomeScreen(
                 singleLine = true
             )
 
-            // Lista de notas
             if (notes.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -182,6 +302,7 @@ fun HomeScreen(
     }
 }
 
+// NoteCard sin cambios
 @Composable
 fun NoteCard(
     note: NoteModel,
@@ -218,18 +339,17 @@ fun NoteCard(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Conversión forzada del String plano de Firebase al ID internacionalizado del XML
-                val categoryText = when(note.category.trim()) {
-                    "Personal" -> stringResource(id = R.string.tab_personal)
+                val categoryText = when (note.category.trim()) {
+                    "Personal"    -> stringResource(id = R.string.tab_personal)
                     "Universidad" -> stringResource(id = R.string.tab_university)
-                    "Trabajo" -> stringResource(id = R.string.tab_work)
-                    "Ideas" -> stringResource(id = R.string.tab_ideas)
-                    "Otro" -> stringResource(id = R.string.tab_other)
-                    else -> note.category
+                    "Trabajo"     -> stringResource(id = R.string.tab_work)
+                    "Ideas"       -> stringResource(id = R.string.tab_ideas)
+                    "Otro"        -> stringResource(id = R.string.tab_other)
+                    else          -> note.category
                 }
 
                 Text(
-                    text = categoryText, // 🌎 Muestra el texto traducido en el badge
+                    text = categoryText,
                     fontSize = 11.sp,
                     color = Color.White,
                     modifier = Modifier
