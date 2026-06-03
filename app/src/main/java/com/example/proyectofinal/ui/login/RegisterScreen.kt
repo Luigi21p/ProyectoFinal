@@ -1,4 +1,4 @@
-package com.example.proyectofinal.ui.login   // 👈 Faltaba el package
+package com.example.proyectofinal.ui.login
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -6,12 +6,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.proyectofinal.R
 import com.example.proyectofinal.navigation.AppScreens
 import com.example.proyectofinal.viewmodel.AuthState
 import com.example.proyectofinal.viewmodel.LoginViewModel
@@ -28,10 +30,13 @@ fun RegisterScreen(
 
     val authState by viewModel.authState.collectAsState()
 
-    // Navega al Dashboard cuando el registro es exitoso
+    val errorEmpty = stringResource(R.string.register_error_empty)
+    val errorMatch = stringResource(R.string.register_error_match)
+    val errorShort = stringResource(R.string.register_error_short)
+
     LaunchedEffect(authState) {
         if (authState is AuthState.Success) {
-            navController.navigate(AppScreens.DashboardScreen.route) {
+            navController.navigate("home") {
                 popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
             }
         }
@@ -43,7 +48,7 @@ fun RegisterScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Crear Cuenta",
+            text = stringResource(R.string.register_title),
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF6200EE)
@@ -54,7 +59,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Correo electrónico") },
+            label = { Text(stringResource(R.string.register_email)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -63,7 +68,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Contraseña") },
+            label = { Text(stringResource(R.string.register_password)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
@@ -73,7 +78,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirmar Contraseña") },
+            label = { Text(stringResource(R.string.register_confirm_password)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
@@ -86,15 +91,9 @@ fun RegisterScreen(
             Button(
                 onClick = {
                     when {
-                        email.isBlank() || password.isBlank() -> {
-                            errorLocal = "Completa todos los campos"
-                        }
-                        password != confirmPassword -> {
-                            errorLocal = "Las contraseñas no coinciden"
-                        }
-                        password.length < 6 -> {
-                            errorLocal = "La contraseña debe tener al menos 6 caracteres"
-                        }
+                        email.isBlank() || password.isBlank() -> errorLocal = errorEmpty
+                        password != confirmPassword           -> errorLocal = errorMatch
+                        password.length < 6                  -> errorLocal = errorShort
                         else -> {
                             errorLocal = ""
                             viewModel.register(email, password)
@@ -104,11 +103,10 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
             ) {
-                Text("Registrarse", color = Color.White)
+                Text(stringResource(R.string.register_btn), color = Color.White)
             }
         }
 
-        // Muestra error local (validación) o error de Firebase
         val mensajeError = errorLocal.ifEmpty {
             (authState as? AuthState.Error)?.message ?: ""
         }
@@ -118,7 +116,7 @@ fun RegisterScreen(
         }
 
         TextButton(onClick = { navController.popBackStack() }) {
-            Text("¿Ya tienes cuenta? Inicia sesión")
+            Text(stringResource(R.string.register_already_account))
         }
     }
 }

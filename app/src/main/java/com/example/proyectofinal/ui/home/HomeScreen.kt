@@ -16,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,12 +24,18 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.data.model.NoteModel
 import com.example.proyectofinal.viewmodel.NoteViewModel
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
+import androidx.navigation.NavController
+import com.example.proyectofinal.navigation.AppScreens
+import com.example.proyectofinal.R
 
 val Purple = Color(0xFF6200EE)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    navController: NavController,
     onNoteClick: (NoteModel) -> Unit,
     onAddNote: () -> Unit,
     viewModel: NoteViewModel = viewModel()
@@ -36,17 +43,55 @@ fun HomeScreen(
     val notes by viewModel.notes.observeAsState(emptyList())
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("Todas") }
-    val categorias = listOf("Todas", "Personal", "Universidad", "Trabajo", "Ideas", "Otro")
+
+    // Estructura clave: Vincula el recurso traducible con el ID interno fijo en la BD
+    val categoriasMap = listOf(
+        R.string.tab_all to "Todas",
+        R.string.tab_personal to "Personal",
+        R.string.tab_university to "Universidad",
+        R.string.tab_work to "Trabajo",
+        R.string.tab_ideas to "Ideas",
+        R.string.tab_other to "Otro"
+    )
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Mis Notas",
+                        text = stringResource(id = R.string.my_notes),
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        try {
+                            com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+                            navController.navigate(AppScreens.LoginScreen.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        } catch (e: Exception) {
+                            navController.popBackStack()
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Cerrar Sesión",
+                            tint = Color.White
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate(AppScreens.SettingsScreen.route)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Configuración",
+                            tint = Color.White
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Purple
@@ -68,24 +113,25 @@ fun HomeScreen(
                 .padding(padding)
                 .background(Color(0xFFF5F5F5))
         ) {
-            // Filtro por categoría
+            // Filtro de categorías solucionado
             ScrollableTabRow(
-                selectedTabIndex = categorias.indexOf(selectedCategory),
+                selectedTabIndex = categoriasMap.map { it.second }.indexOf(selectedCategory).coerceAtLeast(0),
                 containerColor = Color.White,
                 contentColor = Color(0xFF6200EE)
             ) {
-                categorias.forEach { categoria ->
+                categoriasMap.forEach { (stringRes, categoriaId) ->
                     Tab(
-                        selected = selectedCategory == categoria,
+                        selected = selectedCategory == categoriaId,
                         onClick = {
-                            selectedCategory = categoria
-                            if (categoria == "Todas") viewModel.loadNotes()
-                            else viewModel.filterByCategory(categoria)
+                            selectedCategory = categoriaId
+                            if (categoriaId == "Todas") viewModel.loadNotes()
+                            else viewModel.filterByCategory(categoriaId)
                         },
-                        text = { Text(categoria) }
+                        text = { Text(text = stringResource(id = stringRes)) } // 🌎 Renderizado dinámico real de la UI
                     )
                 }
             }
+
             // Barra de búsqueda
             OutlinedTextField(
                 value = searchQuery,
@@ -94,7 +140,7 @@ fun HomeScreen(
                     if (it.isEmpty()) viewModel.loadNotes()
                     else viewModel.searchNotes(it)
                 },
-                placeholder = { Text("Buscar notas...") },
+                placeholder = { Text(stringResource(id = R.string.search_notes)) },
                 leadingIcon = {
                     Icon(Icons.Default.Search, contentDescription = "Buscar")
                 },
@@ -112,7 +158,7 @@ fun HomeScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No hay notas aún\nPresiona + para crear una",
+                        text = stringResource(id = R.string.no_notes),
                         color = Color.Gray,
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center
@@ -171,8 +217,19 @@ fun NoteCard(
                     maxLines = 2
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+
+                // Conversión forzada del String plano de Firebase al ID internacionalizado del XML
+                val categoryText = when(note.category.trim()) {
+                    "Personal" -> stringResource(id = R.string.tab_personal)
+                    "Universidad" -> stringResource(id = R.string.tab_university)
+                    "Trabajo" -> stringResource(id = R.string.tab_work)
+                    "Ideas" -> stringResource(id = R.string.tab_ideas)
+                    "Otro" -> stringResource(id = R.string.tab_other)
+                    else -> note.category
+                }
+
                 Text(
-                    text = note.category,
+                    text = categoryText, // 🌎 Muestra el texto traducido en el badge
                     fontSize = 11.sp,
                     color = Color.White,
                     modifier = Modifier

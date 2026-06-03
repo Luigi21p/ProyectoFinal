@@ -11,11 +11,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext // 💡 Importación necesaria
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.R
 import com.example.proyectofinal.viewmodel.NoteViewModel
+import com.example.proyectofinal.utils.NotificationHelper // 💡 Importación necesaria
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,6 +28,7 @@ fun NoteScreen(
     onBack: () -> Unit,
     viewModel: NoteViewModel = viewModel()
 ) {
+    val context = LocalContext.current // 💡 Capturamos el contexto para la notificación
     val selectedNote by viewModel.selectedNote.observeAsState()
 
     var title by remember { mutableStateOf("") }
@@ -31,7 +36,6 @@ fun NoteScreen(
     var category by remember { mutableStateOf("") }
     var isEditing by remember { mutableStateOf(false) }
 
-    // Si hay una nota seleccionada, cargar sus datos
     LaunchedEffect(selectedNote) {
         selectedNote?.let {
             if (it.id.isNotBlank()) {
@@ -43,12 +47,24 @@ fun NoteScreen(
         }
     }
 
+    val categoriasMap = listOf(
+        stringResource(R.string.tab_personal)   to "Personal",
+        stringResource(R.string.tab_university) to "Universidad",
+        stringResource(R.string.tab_work)       to "Trabajo",
+        stringResource(R.string.tab_ideas)      to "Ideas",
+        stringResource(R.string.tab_other)      to "Otro"
+    )
+
+    val categoryLabel = categoriasMap
+        .firstOrNull { it.second == category }?.first ?: category
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = if (isEditing) "Editar Nota" else "Nueva Nota",
+                        text = if (isEditing) stringResource(R.string.note_edit)
+                        else           stringResource(R.string.note_new),
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
@@ -57,7 +73,7 @@ fun NoteScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = null,
                             tint = Color.White
                         )
                     }
@@ -73,11 +89,23 @@ fun NoteScreen(
                                         category = category
                                     )
                                 )
+                                // 💡 Notificación al actualizar nota
+                                NotificationHelper.sendNoteNotification(
+                                    context = context,
+                                    title = "Nota Actualizada",
+                                    content = "Se guardaron los cambios en '$title'"
+                                )
                             } else {
                                 viewModel.addNote(
                                     title = title,
                                     content = content,
                                     category = category
+                                )
+                                // 💡 Notificación al crear nota nueva
+                                NotificationHelper.sendNoteNotification(
+                                    context = context,
+                                    title = "Nota Creada",
+                                    content = "Se añadió la nota '$title' exitosamente"
                                 )
                             }
                             onBack()
@@ -85,7 +113,7 @@ fun NoteScreen(
                     }) {
                         Icon(
                             Icons.Default.Check,
-                            contentDescription = "Guardar",
+                            contentDescription = null,
                             tint = Color.White
                         )
                     }
@@ -108,26 +136,24 @@ fun NoteScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Título") },
+                label = { Text(stringResource(R.string.note_title)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true
             )
 
             // Campo categoría
-            // Campo categoría
             var expanded by remember { mutableStateOf(false) }
-            val categorias = listOf("Personal", "Universidad", "Trabajo", "Ideas", "Otro")
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }
             ) {
                 OutlinedTextField(
-                    value = category,
+                    value = categoryLabel,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Categoría") },
+                    label = { Text(stringResource(R.string.note_category)) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                     },
@@ -140,11 +166,11 @@ fun NoteScreen(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    categorias.forEach { opcion ->
+                    categoriasMap.forEach { (label, valor) ->
                         DropdownMenuItem(
-                            text = { Text(opcion) },
+                            text = { Text(label) },
                             onClick = {
-                                category = opcion
+                                category = valor
                                 expanded = false
                             }
                         )
@@ -156,7 +182,7 @@ fun NoteScreen(
             OutlinedTextField(
                 value = content,
                 onValueChange = { content = it },
-                label = { Text("Contenido") },
+                label = { Text(stringResource(R.string.note_content)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(300.dp),
@@ -164,10 +190,9 @@ fun NoteScreen(
                 maxLines = 20
             )
 
-            // Texto de ayuda
             if (title.isBlank()) {
                 Text(
-                    text = "El título es obligatorio",
+                    text = stringResource(R.string.note_title_required),
                     color = Color.Red,
                     fontSize = 12.sp
                 )

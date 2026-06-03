@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">ProyectoFinal</string>
+
+    <!-- Home -->
+    <string name="my_notes">My Notes</string>
+    <string name="search_notes">Search notes…</string>
+    <string name="no_notes">No notes yet\nPress + to create one</string>
+    <string name="tab_all">All</string>
+    <string name="tab_personal">Personal</string>
+    <string name="tab_university">University</string>
+    <string name="tab_work">Work</string>
+    <string name="tab_ideas">Ideas</string>
+    <string name="tab_other">Other</string>
+
+    <!-- Login -->
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_btn">Sign In</string>
+    <string name="login_create_account">Create account</string>
+    <string name="login_forgot_password">Forgot your password?</string>
+    <string name="login_recover_title">Recover password</string>
+    <string name="login_recover_desc">Enter your email and we will send you a link to reset your password.</string>
+    <string name="login_recover_send">Send</string>
+    <string name="login_recover_cancel">Cancel</string>
+    <string name="login_recover_empty">Enter your email</string>
+    <string name="login_recover_sent">✓ Email sent, check your inbox</string>
+
+    <!-- Register -->
+    <string name="register_title">Create Account</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_confirm_password">Confirm Password</string>
+    <string name="register_btn">Register</string>
+    <string name="register_already_account">Already have an account? Sign in</string>
+    <string name="register_error_empty">Fill in all fields</string>
+    <string name="register_error_match">Passwords do not match</string>
+    <string name="register_error_short">Password must be at least 6 characters</string>
+
+    <!-- Note -->
+    <string name="note_new">New Note</string>
+    <string name="note_edit">Edit Note</string>
+    <string name="note_title">Title</string>
+    <string name="note_category">Category</string>
+    <string name="note_content">Content</string>
+    <string name="note_title_required">Title is required</string>
+
+    <!-- Export -->
+    <string name="export_title">Export Note</string>
+    <string name="export_select_format">Select export format:</string>
+    <string name="export_markdown_desc">Ideal for documentation and GitHub</string>
+    <string name="export_pdf_desc">To share and print</string>
+    <string name="export_json_desc">Structured format for integration</string>
+    <string name="export_soon">Export as %1$s will be available soon.</string>
+    <string name="export_as">Export as %1$s</string>
+    <string name="export_accept">Accept</string>
+    <string name="export_cancel">Cancel</string>
+
+    <!-- Photo -->
+    <string name="photo_note_title">New note with image</string>
+    <string name="photo_note_field_title">Title</string>
+    <string name="photo_note_field_placeholder">Write the title...</string>
+    <string name="photo_note_no_image">No image selected</string>
+    <string name="photo_note_take_photo">Take photo</string>
+    <string name="photo_note_upload">Upload Image</string>
+    <string name="photo_note_field_note">Note</string>
+    <string name="photo_note_field_note_placeholder">Write your note here...</string>
+    <string name="photo_note_category">Category</string>
+    <string name="photo_annotation_title">Annotate image</string>
+    <string name="photo_annotation_tool_text">Text</string>
+    <string name="photo_annotation_tool_draw">Draw</string>
+    <string name="photo_annotation_tool_effect">Effect</string>
+    <string name="photo_annotation_tool_highlight">Highlight</string>
+    <string name="photo_annotation_canvas_hint">Image editing area</string>
+    <string name="photo_annotation_cancel">CANCEL</string>
+    <string name="photo_annotation_save">SAVE ANNOTATION</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_desc">Select the application language</string>
+</resources>

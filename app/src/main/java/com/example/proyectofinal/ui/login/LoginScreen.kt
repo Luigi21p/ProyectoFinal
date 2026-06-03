@@ -10,12 +10,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.proyectofinal.R
 import com.example.proyectofinal.navigation.AppScreens
 import com.example.proyectofinal.viewmodel.AuthState
 import com.example.proyectofinal.viewmodel.LoginViewModel
@@ -33,15 +35,18 @@ fun LoginScreen(
 
     val authState by viewModel.authState.collectAsState()
 
+    // Necesitamos estos strings fuera del diálogo para usarlos en onClick
+    val strRecoverEmpty = stringResource(R.string.login_recover_empty)
+    val strRecoverSent  = stringResource(R.string.login_recover_sent)
+
     LaunchedEffect(authState) {
         if (authState is AuthState.Success) {
-            navController.navigate(AppScreens.DashboardScreen.route) {
+            navController.navigate("home") {
                 popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
             }
         }
     }
 
-    // Diálogo recuperar contraseña
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -49,11 +54,13 @@ fun LoginScreen(
                 resetMessage = ""
                 resetEmail = ""
             },
-            title = { Text("Recuperar contraseña", fontWeight = FontWeight.Bold) },
+            title = {
+                Text(stringResource(R.string.login_recover_title), fontWeight = FontWeight.Bold)
+            },
             text = {
                 Column {
                     Text(
-                        "Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.",
+                        stringResource(R.string.login_recover_desc),
                         fontSize = 13.sp,
                         color = Color.Gray
                     )
@@ -61,7 +68,7 @@ fun LoginScreen(
                     OutlinedTextField(
                         value = resetEmail,
                         onValueChange = { resetEmail = it },
-                        label = { Text("Correo electrónico") },
+                        label = { Text(stringResource(R.string.login_email)) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(0xFF6200EE),
@@ -81,13 +88,17 @@ fun LoginScreen(
             confirmButton = {
                 TextButton(onClick = {
                     if (resetEmail.isBlank()) {
-                        resetMessage = "Ingresa tu correo"
+                        resetMessage = strRecoverEmpty
                     } else {
                         viewModel.resetPassword(resetEmail)
-                        resetMessage = "✓ Correo enviado, revisa tu bandeja"
+                        resetMessage = strRecoverSent
                     }
                 }) {
-                    Text("Enviar", color = Color(0xFF6200EE), fontWeight = FontWeight.Bold)
+                    Text(
+                        stringResource(R.string.login_recover_send),
+                        color = Color(0xFF6200EE),
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             },
             dismissButton = {
@@ -96,7 +107,7 @@ fun LoginScreen(
                     resetMessage = ""
                     resetEmail = ""
                 }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.login_recover_cancel))
                 }
             }
         )
@@ -136,7 +147,7 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email") },
+                    label = { Text(stringResource(R.string.login_email)) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.Black,
@@ -151,7 +162,7 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = contrasena,
                     onValueChange = { contrasena = it },
-                    label = { Text("Contraseña") },
+                    label = { Text(stringResource(R.string.login_password)) },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -162,13 +173,12 @@ fun LoginScreen(
                     )
                 )
 
-                // 👈 Botón olvidé contraseña
                 TextButton(
                     onClick = { showResetDialog = true },
                     modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(
-                        "¿Olvidaste tu contraseña?",
+                        stringResource(R.string.login_forgot_password),
                         color = Color(0xFF6200EE),
                         fontSize = 13.sp
                     )
@@ -185,7 +195,12 @@ fun LoginScreen(
                         shape = RoundedCornerShape(4.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE))
                     ) {
-                        Text("Iniciar Sesión", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            stringResource(R.string.login_btn),
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
 
@@ -203,7 +218,7 @@ fun LoginScreen(
                 TextButton(onClick = {
                     navController.navigate(AppScreens.RegisterScreen.route)
                 }) {
-                    Text("Crear cuenta")
+                    Text(stringResource(R.string.login_create_account))
                 }
             }
         }

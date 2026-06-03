@@ -7,9 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectofinal.ui.login.LoginScreen
 import com.example.proyectofinal.ui.login.RegisterScreen
-import com.example.proyectofinal.ui.screens.DashboardScreen
 import com.example.proyectofinal.ui.screens.SettingsScreen
-import com.example.proyectofinal.ui.screens.RedactarNotaScreen
 import com.example.proyectofinal.ui.screens.ExportScreen
 import com.example.proyectofinal.ui.screens.PhotoAnnotationScreen
 import com.example.proyectofinal.ui.screens.PhotoNoteScreen
@@ -21,25 +19,17 @@ import com.example.proyectofinal.data.model.NoteModel
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    // Instanciamos el ViewModel de notas aquí para compartirlo entre HomeScreen y NoteScreen
     val noteViewModel: NoteViewModel = viewModel()
 
     NavHost(
         navController = navController,
         startDestination = AppScreens.LoginScreen.route
     ) {
-        // ---- PANTALLAS DE AUTENTICACIÓN & SISTEMA BASE ----
         composable(AppScreens.LoginScreen.route) {
             LoginScreen(navController)
         }
         composable(AppScreens.RegisterScreen.route) {
             RegisterScreen(navController)
-        }
-        composable(AppScreens.DashboardScreen.route) {
-            DashboardScreen(navController)
-        }
-        composable(AppScreens.RedactarNotaScreen.route) {
-            RedactarNotaScreen(navController)
         }
         composable(AppScreens.SettingsScreen.route) {
             SettingsScreen(navController)
@@ -56,10 +46,9 @@ fun AppNavigation() {
                 onConfirmClick = { navController.popBackStack() }
             )
         }
-
-        // ---- PANTALLAS DE TU MÓDULO (GESTIÓN DE NOTAS) ----
         composable("home") {
             HomeScreen(
+                navController = navController,
                 onNoteClick = { note ->
                     noteViewModel.selectNote(note)
                     navController.navigate("note")
@@ -73,9 +62,7 @@ fun AppNavigation() {
         }
         composable("note") {
             NoteScreen(
-                onBack = {
-                    navController.popBackStack()
-                },
+                onBack = { navController.popBackStack() },
                 viewModel = noteViewModel
             )
         }
